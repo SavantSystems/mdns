@@ -115,12 +115,12 @@ func newClient() (*client, error) {
 	if err != nil {
 		log.Printf("[ERR] mdns: Failed to bind to udp4 port: %v", err)
 	}
-	uconn6, err := net.ListenUDP("udp6", &net.UDPAddr{IP: net.IPv6zero, Port: 0})
-	if err != nil {
-		log.Printf("[ERR] mdns: Failed to bind to udp6 port: %v", err)
-	}
+//	uconn6, err := net.ListenUDP("udp6", &net.UDPAddr{IP: net.IPv6zero, Port: 0})
+//	if err != nil {
+//		log.Printf("[ERR] mdns: Failed to bind to udp6 port: %v", err)
+//	}
 
-	if uconn4 == nil && uconn6 == nil {
+	if uconn4 == nil {//&& uconn6 == nil {
 		return nil, fmt.Errorf("failed to bind to any unicast udp port")
 	}
 
@@ -128,20 +128,20 @@ func newClient() (*client, error) {
 	if err != nil {
 		log.Printf("[ERR] mdns: Failed to bind to udp4 port: %v", err)
 	}
-	mconn6, err := net.ListenMulticastUDP("udp6", nil, ipv6Addr)
-	if err != nil {
-		log.Printf("[ERR] mdns: Failed to bind to udp6 port: %v", err)
-	}
+//	mconn6, err := net.ListenMulticastUDP("udp6", nil, ipv6Addr)
+//	if err != nil {
+//		log.Printf("[ERR] mdns: Failed to bind to udp6 port: %v", err)
+//	}
 
-	if mconn4 == nil && mconn6 == nil {
+	if mconn4 == nil {//&& mconn6 == nil {
 		return nil, fmt.Errorf("failed to bind to any multicast udp port")
 	}
 
 	c := &client{
 		ipv4MulticastConn: mconn4,
-		ipv6MulticastConn: mconn6,
+	//	ipv6MulticastConn: mconn6,
 		ipv4UnicastConn:   uconn4,
-		ipv6UnicastConn:   uconn6,
+	//	ipv6UnicastConn:   uconn6,
 		closedCh:          make(chan struct{}),
 	}
 	return c, nil
@@ -157,7 +157,7 @@ func (c *client) Close() error {
 	}
 	c.closed = true
 
-	log.Printf("[INFO] mdns: Closing client %v", *c)
+	//log.Printf("[INFO] mdns: Closing client %v", *c)
 	close(c.closedCh)
 
 	if c.ipv4UnicastConn != nil {
@@ -327,7 +327,7 @@ func (c *client) recv(l *net.UDPConn, msgCh chan *dns.Msg) {
 	for !c.closed {
 		n, err := l.Read(buf)
 		if err != nil {
-			log.Printf("[ERR] mdns: Failed to read packet: %v", err)
+//			log.Printf("[ERR] mdns: Failed to read packet: %v", err)
 			continue
 		}
 		msg := new(dns.Msg)
